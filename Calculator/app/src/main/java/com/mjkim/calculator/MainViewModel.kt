@@ -12,7 +12,7 @@ class MainViewModel: ViewModel() {
 
 
     fun calculate(height: Double, weight: Double){
-        val bmi: Double = weight / (height * height) * 100
+        val bmi: Double = weight / (height/100 * height/100)
         _rankState.value = when {
             bmi <= 18.5 -> Rank.LOW
             bmi <= 22.9 -> Rank.NORMAL
