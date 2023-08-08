@@ -9,6 +9,8 @@ class MainViewModel: ViewModel() {
     private val _rankState:MutableState<Rank> = mutableStateOf(Rank.NONE)
     val rankSate: State<Rank> = _rankState
 
+
+
     fun calculate(height: Double, weight: Double){
         val bmi: Double = weight / (height * height) * 100
         _rankState.value = when {
