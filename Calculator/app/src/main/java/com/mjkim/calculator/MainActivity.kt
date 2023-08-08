@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mjkim.calculator.ui.theme.CalculatorTheme
 import com.mjkim.calculator.ui.theme.calculatorShapes
+import com.mjkim.calculator.ui.theme.calculatorTypography
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,12 +77,17 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text("당신은 ${rank}입니다!", style = calculatorTypography.titleLarge)
+        Spacer(modifier = Modifier.height(16.dp))
         Image(
             painter = painterResource(id = imgId),
             contentDescription = Rank.values().find { it.kor == rank }?.name,
-            modifier = Modifier.widthIn(200.dp).heightIn(200.dp),
+            modifier = Modifier
+                .widthIn(200.dp)
+                .heightIn(200.dp),
             alignment = Alignment.Center
         )
+        Spacer(modifier = Modifier.height(24.dp))
         Box(
            contentAlignment = Alignment.BottomCenter
         ) {
