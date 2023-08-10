@@ -2,6 +2,7 @@ package com.mjkim.calculator
 
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -16,9 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mjkim.calculator.ui.theme.CalculatorTheme
 import com.mjkim.calculator.ui.theme.calculatorShapes
 import com.mjkim.calculator.ui.theme.calculatorTypography
+import com.mjkim.calculator.ui.utils.formattedString
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +71,8 @@ enum class CalculatorScreen {
 
 @Composable
 fun ResultScreen(navController: NavHostController, rank: String? = "") {
+    val viewModel: MainViewModel = viewModel(LocalContext.current as ComponentActivity)
+    Log.d("Result", "rankState = ${viewModel.rankSate.value.kor}")
     val imgId = when (rank) {
         Rank.OBESITY.kor -> R.drawable.pubao
         Rank.LOW.kor -> R.drawable.lesser_panda
@@ -89,7 +95,7 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Box(
-           contentAlignment = Alignment.BottomCenter
+            contentAlignment = Alignment.BottomCenter
         ) {
             Button(onClick = { navController.popBackStack() }) {
                 Text("뒤로가기")
@@ -101,27 +107,36 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MainScreen(onNavigateToResult: (String) -> Unit) {
-    val viewModel: MainViewModel = viewModel()
+    val viewModel: MainViewModel = viewModel(LocalContext.current as ComponentActivity)
+
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.End
     ) {
-        val h = calculatorTextField(title = "키")
-        val w = calculatorTextField(title = "몸무게")
+        val h = calculatorTextField(
+            exText = viewModel.heightState.value?.formattedString() ?: "",
+            title = "키",
+            imeAction = ImeAction.Next
+        )
+        val w = calculatorTextField(
+            exText = viewModel.weightState.value?.formattedString() ?: "",
+            title = "몸무게",
+            imeAction = ImeAction.Done
+        )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             modifier = Modifier
                 .widthIn(40.dp)
-                .heightIn(20.dp),
+                .heightIn(20.dp)
+                .align(Alignment.End),
             shape = calculatorShapes.small,
             onClick = {
                 keyboardController?.hide()
                 viewModel.calculate(height = h.toDouble(), weight = w.toDouble())
-                println("${viewModel.rankSate.value}")
+                Log.d("Main", "rankState = ${viewModel.rankSate.value}")
                 onNavigateToResult(viewModel.rankSate.value.kor)
             }
         ) {
@@ -131,15 +146,18 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
 }
 
 @Composable
-fun calculatorTextField(title: String): String {
+fun calculatorTextField(exText: String = "", title: String, imeAction: ImeAction): String {
     val (text, setText) = remember {
-        mutableStateOf("")
+        mutableStateOf(exText)
     }
     OutlinedTextField(
         value = text,
         onValueChange = setText,
         label = { Text(title) },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = imeAction
+        ),
         modifier = Modifier.fillMaxWidth()
     )
     return text
