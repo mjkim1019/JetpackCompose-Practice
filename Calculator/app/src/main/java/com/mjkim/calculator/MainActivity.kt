@@ -109,7 +109,6 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.End
     ) {
         val h = calculatorTextField(title = "키", imeAction = ImeAction.Next)
         val w = calculatorTextField(title = "몸무게", imeAction = ImeAction.Done)
@@ -117,7 +116,8 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
         Button(
             modifier = Modifier
                 .widthIn(40.dp)
-                .heightIn(20.dp),
+                .heightIn(20.dp)
+                .align(Alignment.End),
             shape = calculatorShapes.small,
             onClick = {
                 keyboardController?.hide()
