@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -89,7 +90,7 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Box(
-           contentAlignment = Alignment.BottomCenter
+            contentAlignment = Alignment.BottomCenter
         ) {
             Button(onClick = { navController.popBackStack() }) {
                 Text("뒤로가기")
@@ -110,8 +111,8 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.End
     ) {
-        val h = calculatorTextField(title = "키")
-        val w = calculatorTextField(title = "몸무게")
+        val h = calculatorTextField(title = "키", imeAction = ImeAction.Next)
+        val w = calculatorTextField(title = "몸무게", imeAction = ImeAction.Done)
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             modifier = Modifier
@@ -131,7 +132,7 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
 }
 
 @Composable
-fun calculatorTextField(title: String): String {
+fun calculatorTextField(title: String, imeAction: ImeAction): String {
     val (text, setText) = remember {
         mutableStateOf("")
     }
@@ -139,7 +140,10 @@ fun calculatorTextField(title: String): String {
         value = text,
         onValueChange = setText,
         label = { Text(title) },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = imeAction
+        ),
         modifier = Modifier.fillMaxWidth()
     )
     return text
