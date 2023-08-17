@@ -74,9 +74,10 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
     val viewModel: MainViewModel = viewModel(LocalContext.current as ComponentActivity)
     Log.d("Result", "rankState = ${viewModel.rankSate.value.kor}")
     val imgId = when (rank) {
-        Rank.OBESITY.kor -> R.drawable.pubao
-        Rank.LOW.kor -> R.drawable.lesser_panda
-        else -> R.drawable.choi
+        Rank.OBESITY.kor -> R.drawable.img_pubao
+        Rank.LOW.kor -> R.drawable.img_lesser_panda
+        Rank.NORMAL.kor -> R.drawable.ic_smile
+        else -> R.drawable.img_choi
     }
     Column(
         modifier = Modifier.fillMaxSize(),
