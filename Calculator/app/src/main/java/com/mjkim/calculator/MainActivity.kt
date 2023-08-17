@@ -89,9 +89,7 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
         Image(
             painter = painterResource(id = imgId),
             contentDescription = Rank.values().find { it.kor == rank }?.name,
-            modifier = Modifier
-                .widthIn(200.dp)
-                .heightIn(200.dp),
+            modifier = Modifier.size(100.dp),
             alignment = Alignment.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
