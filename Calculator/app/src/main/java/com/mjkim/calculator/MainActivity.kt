@@ -134,7 +134,9 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
             shape = calculatorShapes.small,
             onClick = {
                 keyboardController?.hide()
-                viewModel.calculate(height = h.toDouble(), weight = w.toDouble())
+                if (h.isNotEmpty() && w.isNotEmpty()) {
+                    viewModel.calculate(height = h.toDouble(), weight = w.toDouble())
+                }
                 Log.d("Main", "rankState = ${viewModel.rankSate.value}")
                 onNavigateToResult(viewModel.rankSate.value.kor)
             }
@@ -166,6 +168,6 @@ fun calculatorTextField(exText: String = "", title: String, imeAction: ImeAction
 @Composable
 fun DefaultPreview() {
     CalculatorTheme {
-        ResultScreen(rememberNavController(), Rank.OBESITY.kor)
+        ResultScreen(rememberNavController(), Rank.NORMAL.kor)
     }
 }
