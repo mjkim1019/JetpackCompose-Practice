@@ -17,12 +17,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -48,19 +46,21 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CalculatorApp() {
     val navController = rememberNavController()
-    NavHostScreen(navController = navController)
+    val viewModel = viewModel<MainViewModel>()
+    NavHostScreen(viewModel = viewModel, navController = navController)
 }
 
 @Composable
-fun NavHostScreen(navController: NavHostController) {
+fun NavHostScreen(viewModel: MainViewModel, navController: NavHostController) {
+    val rank = viewModel.rankSate.value
     NavHost(navController = navController, startDestination = CalculatorScreen.Main.name) {
         composable(CalculatorScreen.Main.name) {
-            MainScreen { result ->
-                navController.navigate("${CalculatorScreen.Result.name}/$result")
+            MainScreen(viewModel) { h, w ->
+                viewModel.calculate(h, w)
             }
         }
         composable("${CalculatorScreen.Result.name}/{rank}") { backEntryStack ->
-            ResultScreen(navController, backEntryStack.arguments?.getString("rank"))
+            ResultScreen(viewModel, navController, backEntryStack.arguments?.getString("rank"))
         }
     }
 }
@@ -70,8 +70,7 @@ enum class CalculatorScreen {
 }
 
 @Composable
-fun ResultScreen(navController: NavHostController, rank: String? = "") {
-    val viewModel: MainViewModel = viewModel(LocalContext.current as ComponentActivity)
+fun ResultScreen(viewModel: MainViewModel, navController: NavHostController, rank: String? = "") {
     Log.d("Result", "rankState = ${viewModel.rankSate.value.kor}")
     val imgId = when (rank) {
         Rank.OBESITY.kor -> R.drawable.img_pubao
@@ -105,9 +104,7 @@ fun ResultScreen(navController: NavHostController, rank: String? = "") {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MainScreen(onNavigateToResult: (String) -> Unit) {
-    val viewModel: MainViewModel = viewModel(LocalContext.current as ComponentActivity)
-
+fun MainScreen(viewModel: MainViewModel, onResultClicked: (Double, Double) -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier
@@ -135,10 +132,9 @@ fun MainScreen(onNavigateToResult: (String) -> Unit) {
             onClick = {
                 keyboardController?.hide()
                 if (h.isNotEmpty() && w.isNotEmpty()) {
-                    viewModel.calculate(height = h.toDouble(), weight = w.toDouble())
+                    onResultClicked(h.toDouble(), w.toDouble())
                 }
-                Log.d("Main", "rankState = ${viewModel.rankSate.value}")
-                onNavigateToResult(viewModel.rankSate.value.kor)
+
             }
         ) {
             Text("결과")
@@ -157,17 +153,9 @@ fun calculatorTextField(exText: String = "", title: String, imeAction: ImeAction
         label = { Text(title) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
-            imeAction = imeAction
+            imeAction = imeAction,
         ),
         modifier = Modifier.fillMaxWidth()
     )
     return text
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    CalculatorTheme {
-        ResultScreen(rememberNavController(), Rank.NORMAL.kor)
-    }
 }
