@@ -2,7 +2,6 @@ package com.mjkim.calculator
 
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -56,11 +55,12 @@ fun NavHostScreen(viewModel: MainViewModel, navController: NavHostController) {
     NavHost(navController = navController, startDestination = CalculatorScreen.Main.name) {
         composable(CalculatorScreen.Main.name) {
             MainScreen(viewModel) { h, w ->
-                viewModel.calculate(h, w)
+                viewModel.calculate(h, w) // rankState 갱신 발생
+                navController.navigate(CalculatorScreen.Result.name)
             }
         }
-        composable("${CalculatorScreen.Result.name}/{rank}") { backEntryStack ->
-            ResultScreen(viewModel, navController, backEntryStack.arguments?.getString("rank"))
+        composable(CalculatorScreen.Result.name) {
+            ResultScreen(navController, rank)
         }
     }
 }
@@ -70,12 +70,11 @@ enum class CalculatorScreen {
 }
 
 @Composable
-fun ResultScreen(viewModel: MainViewModel, navController: NavHostController, rank: String? = "") {
-    Log.d("Result", "rankState = ${viewModel.rankSate.value.kor}")
+fun ResultScreen(navController: NavHostController, rank: Rank) {
     val imgId = when (rank) {
-        Rank.OBESITY.kor -> R.drawable.img_pubao
-        Rank.LOW.kor -> R.drawable.img_lesser_panda
-        Rank.NORMAL.kor -> R.drawable.ic_smile
+        Rank.OBESITY -> R.drawable.img_pubao
+        Rank.LOW -> R.drawable.img_lesser_panda
+        Rank.NORMAL -> R.drawable.ic_smile
         else -> R.drawable.img_choi
     }
     Column(
@@ -83,11 +82,11 @@ fun ResultScreen(viewModel: MainViewModel, navController: NavHostController, ran
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("당신은 ${rank}입니다!", style = calculatorTypography.titleLarge)
+        Text("당신은 ${rank.kor}!", style = calculatorTypography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
         Image(
             painter = painterResource(id = imgId),
-            contentDescription = Rank.values().find { it.kor == rank }?.name,
+            contentDescription = Rank.values().find { it == rank }?.name,
             modifier = Modifier.size(100.dp),
             alignment = Alignment.Center
         )
@@ -134,7 +133,6 @@ fun MainScreen(viewModel: MainViewModel, onResultClicked: (Double, Double) -> Un
                 if (h.isNotEmpty() && w.isNotEmpty()) {
                     onResultClicked(h.toDouble(), w.toDouble())
                 }
-
             }
         ) {
             Text("결과")
