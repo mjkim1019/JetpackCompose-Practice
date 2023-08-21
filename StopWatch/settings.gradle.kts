@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "StopWatch"
 include(":app")
+include(":core-designsystem")

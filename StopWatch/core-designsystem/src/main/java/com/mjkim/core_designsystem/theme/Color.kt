@@ -1,4 +1,4 @@
-package com.mjkim.stopwatch.ui.theme
+package com.mjkim.core_designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
